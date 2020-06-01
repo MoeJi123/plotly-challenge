@@ -1,3 +1,29 @@
+// Display the default plot
+var intData = data.samples.filter(val => val.id == "940");
+
+function init() {
+
+  var barData = [{
+    x: intData[0].sample_values,
+    y: intData[0].otu_ids,
+    text: intData[0].otu_labels,
+    type: "bar",
+    orientation: "h"
+  }];
+
+  // Apply the group bar mode to the layout
+  var layout = {
+    margin: {
+      l: 100,
+      r: 100,
+      t: 100,
+      b: 100
+    }
+  };
+
+  // Render the plot to the div tag with id "plot"
+  Plotly.newPlot("bar", barData,layout);
+
 // Step 1: Plotly
 d3.select("#selDataset").on("change", selectedDataset);
 
@@ -149,4 +175,5 @@ d3.json("data/samples.json").then((importedData) => {
 
 
   };
-  
+
+init();
