@@ -1,28 +1,28 @@
-// Display the default plot
-var intData = data.samples.filter(val => val.id == "940");
+// // Display the default plot
+// var intData = data.samples.filter(val => val.id == "940");
 
-function init() {
+// function init() {
 
-  var barData = [{
-    x: intData[0].sample_values,
-    y: intData[0].otu_ids,
-    text: intData[0].otu_labels,
-    type: "bar",
-    orientation: "h"
-  }];
+//   var barData = [{
+//     x: intData[0].sample_values,
+//     y: intData[0].otu_ids,
+//     text: intData[0].otu_labels,
+//     type: "bar",
+//     orientation: "h"
+//   }];
 
-  // Apply the group bar mode to the layout
-  var layout = {
-    margin: {
-      l: 100,
-      r: 100,
-      t: 100,
-      b: 100
-    }
-  };
+//   // Apply the group bar mode to the layout
+//   var layout = {
+//     margin: {
+//       l: 100,
+//       r: 100,
+//       t: 100,
+//       b: 100
+//     }
+//   };
 
-  // Render the plot to the div tag with id "plot"
-  Plotly.newPlot("bar", barData,layout);
+//   // Render the plot to the div tag with id "plot"
+//   Plotly.newPlot("bar", barData,layout);
 
 // Step 1: Plotly
 d3.select("#selDataset").on("change", selectedDataset);
@@ -123,7 +123,8 @@ d3.json("data/samples.json").then((importedData) => {
       mode: 'markers',
       marker: {
         size: filteredData[0].sample_values,
-        color: ['rgb(93, 164, 214)', 'rgb(255, 144, 14)',  'rgb(44, 160, 101)', 'rgb(255, 65, 54)']
+        color: filteredData[0].otu_ids,
+        colorscale: 'Earth'
       },
       text: filteredData[0].otu_labels,
     };
@@ -136,44 +137,40 @@ d3.json("data/samples.json").then((importedData) => {
 
   var  metaData = data.metadata.filter(val => val.id == selected_id);
   
-  metaDataEntries = Object.entries(metaData);
+  metaDataEntries = Object.entries(metaData[0]);
 
   console.log(metaDataEntries);
 
   d3.select("tbody")
+  .selectAll("tr")
   .data(metaDataEntries)
   .enter()
   .append("tr")
   .html(function(d) {
-    return `<td>${d.id}</td>`
+    return `<td>${d[0]}</td><td>${d[1]}</td>`
   });
 
 // Step2 Advanced Challenge Assignment 
 
   var gauge = d3.select("#gauge");
 
-  var gaugeData = [
+  var gaugeData= [
     {
-      type: "gauge",
-      'scale-r': {
-        aperture: 9,     //Specify your scale range.
-        values: "0:9:1" //Provide min/max/step scale values.
-      },
-      series: 
-        {
-          values: metaData.wfreq,
-          csize: "15%",
-          size: "75%",
-          'background-color': "#CC0066"
-        }
+      domain: { x: [0, 1], y: [0, 1] },
+      value: metaData[0].wfreq,
+      title: { text: "Washing Frequency" },
+      type: "indicator",
+      mode: "gauge+number",
+      gauge: { axis: { range: [null, 10] }}
     }
   ];
 
-  console.log(gaugeData);
+
+  console.log(metaData);
+
 
   Plotly.newPlot("gauge",gaugeData);
 
-
   };
 
-init();
+// init();
