@@ -29,10 +29,27 @@ d3.json("data/samples.json").then((importedData) => {
 
 function init() {
 
+  intData.sort(function(a, b) {
+    return parseInt(b[0].sample_values) - parseInt(a[0].sample_values);
+  });
+
+  sample_values =  intData[0].sample_values;
+
+  otuID =  intData[0].otu_ids;
+
+  otuLabels =  intData[0].otu_labels;
+
+  // Slice & reverse the first 10 objects for plotting
+  sampleData = sample_values.slice(0, 10).reverse();
+
+  otuData = otuID.slice(0,10).reverse();
+
+  labelData = otuLabels.slice(0,10).reverse();
+
   var trace1 = {
-    x: intData[0].sample_values,
-    y: intData[0].otu_ids.map(otu => `OTU ${otu}`),
-    text:  intData[0].otu_labels,
+    x: sampleData,
+    y: otuData.map(otu => `OTU ${otu}`),
+    text:  labelData,
     type: "bar",
     orientation: "h"
   };
@@ -150,7 +167,6 @@ function init() {
     console.log(otuData);
     console.log(labelData);
   
-    // Trace1 for the Greek Data
     var trace1 = {
       x: sampleData,
       y: otuData.map(otu => `OTU ${otu}`),
