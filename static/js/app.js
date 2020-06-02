@@ -1,33 +1,8 @@
-// // Display the default plot
-// var intData = data.samples.filter(val => val.id == "940");
-
-// function init() {
-
-//   var barData = [{
-//     x: intData[0].sample_values,
-//     y: intData[0].otu_ids,
-//     text: intData[0].otu_labels,
-//     type: "bar",
-//     orientation: "h"
-//   }];
-
-//   // Apply the group bar mode to the layout
-//   var layout = {
-//     margin: {
-//       l: 100,
-//       r: 100,
-//       t: 100,
-//       b: 100
-//     }
-//   };
-
-//   // Render the plot to the div tag with id "plot"
-//   Plotly.newPlot("bar", barData,layout);
-
-// Step 1: Plotly
 d3.select("#selDataset").on("change", selectedDataset);
 
 var data = [];
+
+var intData = [];
 
 d3.json("data/samples.json").then((importedData) => {
 
@@ -35,7 +10,11 @@ d3.json("data/samples.json").then((importedData) => {
     // console.log(importedData);
     data = importedData;
 
-    // console.log(data);
+    intData = data.samples.filter(val => val.id == "940");
+
+    console.log(intData); 
+
+    init();
 
     // create dropdowns
     var id = data.samples.map(val => val.id);
@@ -45,6 +24,92 @@ d3.json("data/samples.json").then((importedData) => {
         document.getElementById("selDataset").innerHTML += '<option id="' + i + '">' + id[i] + '</option>';
       }  
   });
+
+// Create initial charts for display
+
+function init() {
+
+  var trace1 = {
+    x: intData[0].sample_values,
+    y: intData[0].otu_ids.map(otu => `OTU ${otu}`),
+    text:  intData[0].otu_labels,
+    type: "bar",
+    orientation: "h"
+  };
+
+  var chartData = [trace1];
+
+  // Apply the group bar mode to the layout
+  var layout = {
+    margin: {
+      l: 100,
+      r: 100,
+      t: 100,
+      b: 100
+    }
+  };
+
+  // Create the bubble Plot
+  Plotly.newPlot("bar", chartData,layout);
+
+  var bubble = d3.select("#bubble");
+    
+  var trace2 = {
+    x: intData[0].otu_ids,
+    y: intData[0].sample_values,
+    mode: 'markers',
+    marker: {
+      size: intData[0].sample_values,
+      color: intData[0].otu_ids,
+      colorscale: 'Earth'
+    },
+    text: intData[0].otu_labels,
+  };
+  
+  var bubbleData = [trace2];
+  
+  Plotly.newPlot('bubble', bubbleData);
+
+  // Create the demgraphic table
+
+  var  metaData = data.metadata.filter(val => val.id == "940");
+  
+  metaDataEntries = Object.entries(metaData[0]);
+
+  console.log(metaDataEntries);
+
+  d3.select("tbody")
+  .selectAll("tr")
+  .data(metaDataEntries)
+  .enter()
+  .append("tr")
+  .html(function(d) {
+    return `<td>${d[0]}</td><td>${d[1]}</td>`
+  });
+
+  // Create the gauge chart
+
+  var gauge = d3.select("#gauge");
+
+  var gaugeData= [
+    {
+      domain: { x: [0, 1], y: [0, 1] },
+      value: metaData[0].wfreq,
+      title: { text: "Belly Button Washing Frequency" },
+      type: "indicator",
+      mode: "gauge+number",
+      gauge: { axis: { range: [null, 10] }}
+    }
+  ];
+
+  console.log(metaData);
+
+
+  Plotly.newPlot("gauge",gaugeData);
+
+}
+
+// Step 1: Plotly
 
   function selectedDataset() {
 
@@ -113,7 +178,7 @@ d3.json("data/samples.json").then((importedData) => {
     Plotly.newPlot("bar", chartData,layout);
 
     
-  // Creat bubble plot
+    // Creat bubble plot
 
     var bubble = d3.select("#bubble");
     
@@ -133,24 +198,24 @@ d3.json("data/samples.json").then((importedData) => {
     
     Plotly.newPlot('bubble', bubbleData);
 
-  // Create Demographic info table
+    // Create Demographic info table
 
-  var  metaData = data.metadata.filter(val => val.id == selected_id);
-  
-  metaDataEntries = Object.entries(metaData[0]);
+    var  metaData = data.metadata.filter(val => val.id == selected_id);
+    
+    metaDataEntries = Object.entries(metaData[0]);
 
-  console.log(metaDataEntries);
+    console.log(metaDataEntries);
 
-  d3.select("tbody")
-  .selectAll("tr")
-  .data(metaDataEntries)
-  .enter()
-  .append("tr")
-  .html(function(d) {
-    return `<td>${d[0]}</td><td>${d[1]}</td>`
-  });
+    d3.select("tbody")
+    .selectAll("tr")
+    .data(metaDataEntries)
+    .enter()
+    .append("tr")
+    .html(function(d) {
+      return `<td>${d[0]}</td><td>${d[1]}</td>`
+    });
 
-// Step2 Advanced Challenge Assignment 
+// Step2 Advanced Challenge Assignment - Create Gauge Chart 
 
   var gauge = d3.select("#gauge");
 
@@ -158,7 +223,7 @@ d3.json("data/samples.json").then((importedData) => {
     {
       domain: { x: [0, 1], y: [0, 1] },
       value: metaData[0].wfreq,
-      title: { text: "Washing Frequency" },
+      title: { text: "Belly Button Washing Frequency" },
       type: "indicator",
       mode: "gauge+number",
       gauge: { axis: { range: [null, 10] }}
@@ -173,4 +238,4 @@ d3.json("data/samples.json").then((importedData) => {
 
   };
 
-// init();
+
